@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
+import com.mobile.recorduserapp.utils.sh10
 
 
 @Composable
@@ -113,10 +114,11 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(top = 20.dp,)
             )
+            sh10()
 
-            textboldcutom(text = "All ", size = 15, color = Color.Black)
+            textboldcutom(text = "All ", size = 14, color = Color.Black)
         }
 
     }
