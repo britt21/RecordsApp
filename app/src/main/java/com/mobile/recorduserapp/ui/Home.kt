@@ -36,14 +36,30 @@ import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
 import androidx.compose.ui.modifier.*
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
 
 
 @Composable
-fun HomeScreen(modifier: Modifier){
+fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
 
+
+    val allusers by viewModel.liveUsers.observeAsState()
+    val error by viewModel.error.observeAsState()
+
+
+    allusers.let { println("DDDAATAA:: +" + it) }
+    println("USERSSFONUND:: "+allusers)
+    println("FATALL:: "+error)
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getUsers()
+    }
     Column (
         modifier = modifier
             .background(Color.White)

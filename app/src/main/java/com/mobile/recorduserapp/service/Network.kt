@@ -12,7 +12,7 @@ interface Service{
 
 
     @GET("/pupils?page=1")
-    fun getUsers():Response<GetAllUsers>
+    suspend  fun getUsers():Response<GetAllUsers>
 
 
 }
@@ -23,7 +23,7 @@ var retrofit = Retrofit.Builder()
     .client(OkHttpClient.Builder().build())
     .build()
 
-object  Network{
+object  ApiService{
     val apicall : Service by lazy {
        retrofit.create(Service::class.java)
     }
