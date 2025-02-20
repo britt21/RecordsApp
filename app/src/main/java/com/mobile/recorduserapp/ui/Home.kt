@@ -32,6 +32,7 @@ import com.mobile.recorduserapp.utils.addimage
 import com.mobile.recorduserapp.utils.textboldcutom
 import com.mobile.recorduserapp.utils.textlit
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.filled.Search
@@ -123,6 +124,14 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
 
             textboldcutom(text = "All ", size = 14, color = Color.Black)
 
+            LazyColumn {
+                if (allusers.items.isNullOrEmpty()) {
+                    items(allusers!!.items!!.size){
+
+                    }
+                }
+
+            }
             LocationCard(name = "John Doe", country = "USA", latitude = "40.7128° N", longitude = "74.0060° W")
         }
 
