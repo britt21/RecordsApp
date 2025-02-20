@@ -1,0 +1,5 @@
+package com.mobile.recorduserapp.data.cons
+
+
+
+const val HOMESCREEN = "HOME"
