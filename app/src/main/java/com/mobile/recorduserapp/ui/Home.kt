@@ -32,6 +32,7 @@ import com.mobile.recorduserapp.utils.addimage
 import com.mobile.recorduserapp.utils.textboldcutom
 import com.mobile.recorduserapp.utils.textlit
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -39,7 +40,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
 import androidx.compose.ui.modifier.*
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
@@ -119,9 +122,55 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
             sh10()
 
             textboldcutom(text = "All ", size = 14, color = Color.Black)
+
+            LocationCard(name = "John Doe", country = "USA", latitude = "40.7128° N", longitude = "74.0060° W")
         }
+
+
+
 
     }
     }
+
+@Composable
+fun LocationCard(name: String, country: String, latitude: String, longitude: String) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.4f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            InfoText(title = "Name:", value = name, isBold = true)
+            InfoText(title = "Country:", value = country)
+            InfoText(title = "Latitude:", value = latitude)
+            InfoText(title = "Longitude:", value = longitude)
+        }
+    }
+}
+
+@Composable
+fun InfoText(title: String, value: String, isBold: Boolean = false) {
+    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = value,
+            fontSize = 16.sp,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
+            color = Color.Black.copy(alpha = 0.8f)
+        )
+    }
+}
 
 
