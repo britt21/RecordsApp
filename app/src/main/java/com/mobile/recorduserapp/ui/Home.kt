@@ -2,6 +2,7 @@ package com.mobile.recorduserapp.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.mobile.recorduserapp.ui.theme.litg
+import com.mobile.recorduserapp.ui.theme.whitecolor
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
 import com.mobile.recorduserapp.utils.buttons.appbutton
 import com.mobile.recorduserapp.utils.sh10
@@ -125,21 +127,72 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
             )
             sh10()
 
+            Row {
+                Box(modifier = Modifier.height(30.dp)){
+                    textlit(text = "All", size = 13, color = whitecolor)
+                }
+            }
             textboldcutom(text = "All ", size = 14, color = Color.Black)
+
+            Box(
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxWidth().border(color = greyTextColor, width = 1.dp, shape = RoundedCornerShape(10.dp))
+            ) {
+
+
+
+                Column(modifier = Modifier.fillMaxSize().padding(0.dp)) {
+
+                    addimage(image = R.drawable.food, modifier = Modifier.fillMaxWidth())
+
+                        Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+
+                        Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        textboldcutom(
+                            text = "Garlic Butter Shrimp Pasta",
+                            size = 14,
+                            color = Color.Black,
+                            modifier = Modifier.weight(1f) // Ensures text gets space
+                        )
+                        addimage(image = R.drawable.like)
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        addimage(image = R.drawable.fire)
+                        textlit(
+                            text = "320 Calories",
+                            size = 14,
+                            color = Color.Black,
+                            modifier = Modifier.padding(start = 8.dp) // Adds spacing from image
+                        )
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        textlit(
+                            text = "Creamy hummus spread on whole grain toast topped with sliced cucumbers and radishes.",
+                            size = 14,
+                            color = Color.Black,
+                            modifier = Modifier.padding(start = 0.dp)
+                        )
+                    }
+                    }
+
+                }
+            }
 
 
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().height(500.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
             )
             {
                 allusers?.let {
-                    items(allusers!!.items!!) {
-                        LocationCard(
-                            name = "${it?.name}",
-                            country = "${it?.country}",
-                            latitude = "${it?.latitude}",
-                            longitude = "${it?.longitude}"
-                        )
+                    items(allusers!!.data!!) {
+
 
 
                     }

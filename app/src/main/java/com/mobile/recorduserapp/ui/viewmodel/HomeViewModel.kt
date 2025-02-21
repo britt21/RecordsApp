@@ -3,6 +3,7 @@ package com.mobile.recorduserapp.ui.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mobile.recorduserapp.data.response.foods.FoodResponse
 import com.mobile.recorduserapp.data.response.getusers.GetAllUsers
 import com.mobile.recorduserapp.service.ApiService
 import kotlinx.coroutines.launch
@@ -12,7 +13,7 @@ import java.io.IOException
 class HomeViewModel:ViewModel() {
 
 
-    var liveUsers :MutableLiveData<GetAllUsers> = MutableLiveData()
+    var liveUsers :MutableLiveData<FoodResponse> = MutableLiveData()
     var error :MutableLiveData<String> = MutableLiveData()
     var isloading :MutableLiveData<Boolean> = MutableLiveData()
 
