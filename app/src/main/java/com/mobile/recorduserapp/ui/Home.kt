@@ -33,6 +33,7 @@ import com.mobile.recorduserapp.utils.textboldcutom
 import com.mobile.recorduserapp.utils.textlit
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.filled.Search
@@ -46,7 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import com.mobile.recorduserapp.ui.theme.litg
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
+import com.mobile.recorduserapp.utils.buttons.appbutton
 import com.mobile.recorduserapp.utils.sh10
 
 
@@ -124,17 +127,31 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
 
             textboldcutom(text = "All ", size = 14, color = Color.Black)
 
-            LazyColumn {
-                if (allusers.items.isNullOrEmpty()) {
-                    items(allusers!!.items!!.size){
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().height(500.dp)
+            )
+            {
+                allusers?.let {
+                    items(allusers!!.items!!) {
+                        LocationCard(
+                            name = "${it?.name}",
+                            country = "${it?.country}",
+                            latitude = "${it?.latitude}",
+                            longitude = "${it?.longitude}"
+                        )
+
 
                     }
                 }
 
             }
-            LocationCard(name = "John Doe", country = "USA", latitude = "40.7128° N", longitude = "74.0060° W")
         }
 
+
+        Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom){
+            appbutton("Add", modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp))
+        }
 
 
 
@@ -145,7 +162,8 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
 fun LocationCard(name: String, country: String, latitude: String, longitude: String) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.4f)),
+        colors = CardDefaults.cardColors(containerColor = litg),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
