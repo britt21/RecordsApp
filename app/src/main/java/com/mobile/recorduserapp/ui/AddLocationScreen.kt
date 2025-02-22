@@ -40,30 +40,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.rememberAsyncImagePainter
 import com.mobile.recorduserapp.data.request.create_user.CreateUser
-import com.mobile.recorduserapp.data.request.edituser.EditUser
 import com.mobile.recorduserapp.ui.theme.yellowColor
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
 import com.mobile.recorduserapp.utils.error.errorbox
 import com.mobile.recorduserapp.utils.sh10
-import com.mobile.recorduserapp.utils.sh20
-import com.mobile.recorduserapp.utils.sh30
 import com.mobile.recorduserapp.utils.showToast
 
 
 @Composable
-fun EditScreen(
+fun AddLocationScreen(
     modifier: Modifier, viewModel: HomeViewModel = viewModel(), navController: NavController
 ) {
-   var country: String = "${viewModel.edituser.country}"
-   var name: String = "${viewModel.edituser.name}"
-   var image: String = "${viewModel.edituser.image}"
-   var latitude: String ="${viewModel.edituser.latitude}"
-   var longitude: String = "${viewModel.edituser.longitude}"
-
-
+   var country: String = ""
+   var name: String = ""
+   var image: String = ""
+   var latitude: String =""
+   var longitude: String = ""
 
     val isloading by viewModel.isloading.observeAsState()
-    val livedelete by viewModel.liveDeleteUser.observeAsState()
 
 
     var context = LocalContext.current
@@ -73,25 +67,15 @@ fun EditScreen(
     var updatedLatitude by remember { mutableStateOf(latitude.toString()) }
     var updatedLongitude by remember { mutableStateOf(longitude.toString()) }
 
-    val liveuser by viewModel.liveEditUser.observeAsState()
+    val liveuser by viewModel.livecreateuser.observeAsState()
     val error by viewModel.error.observeAsState()
 
     liveuser?.let {
         LaunchedEffect(Unit) {
 
 
-            showToast(context, "Edited  Successfully\nID: ${it.pupilId}",)
+            showToast(context, "Created Successfully\nID: ${it.pupilId}",)
             println("FOUNDATA:: " + it)
-            navController.popBackStack()
-            viewModel.clearlog()
-        }
-    }
-
-    livedelete?.let {
-        LaunchedEffect(Unit) {
-
-
-            showToast(context, "Deleted  Successfully\nID: ${viewModel.edituser.pupilId}",)
             navController.popBackStack()
             viewModel.clearlog()
         }
@@ -108,16 +92,16 @@ fun EditScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(16.dp)
             .background(Color.White)
+            .verticalScroll(rememberScrollState())
         ,
     ) {
         addimage(R.drawable.back, modifier = Modifier.clickable { navController.popBackStack() })
 
         error?.let {
             var createUser = CreateUser(updatedCountry,"https://www.freepik.com/premium-photo/indian-young-happy-man-image_23019783.htm",updatedLatitude,updatedLatitude,updatedName,)
-
+            println("CREATINGLL:: "+createUser)
 
             errorbox("Error","${it}",{ true}, { viewModel.createUsers(createUser)})
 
@@ -235,10 +219,10 @@ fun EditScreen(
             Button(
                 onClick = {
 
-                    if(userinputvalidator(context = context,updatedName,updatedCountry,updatedLatitude,updatedLongitude)){
-                        var editUser = EditUser(updatedCountry,"https://www.freepik.com/premium-photo/indian-young-happy-man-image_23019783.htm",updatedLatitude,updatedLatitude,updatedName, pupilId = viewModel.edituser.pupilId)
-                        println("CREATINGLL:: "+editUser)
-                        viewModel.editUser(viewModel.edituser.pupilId!!,editUser)
+                    if(validator(context = context,updatedName,updatedCountry,updatedLatitude,updatedLongitude)){
+                        var createUser = CreateUser(updatedCountry,"https://www.freepik.com/premium-photo/indian-young-happy-man-image_23019783.htm",updatedLatitude,updatedLatitude,updatedName,)
+                        println("CREATINGLL:: "+createUser)
+                        viewModel.createUsers(createUser)
 
                     }
                 },
@@ -248,27 +232,11 @@ fun EditScreen(
                 Text("Save", color = Color.Black)
             }
         }
-
-        sh30()
-
-        Button(modifier = Modifier.fillMaxWidth().height(50.dp),
-            onClick = {
-
-                viewModel.deleteuser(viewModel.edituser.pupilId!!)
-
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-        ) {
-            Text("Delete")
-        }
     }
 
 }
 
-
-
-
-fun userinputvalidator(context:Context,name:String, ct:String, la:String, lo:String, ):Boolean{
+fun validator(context:Context,name:String, ct:String, la:String, lo:String, ):Boolean{
 
     if (name.isEmpty()){
         showToast(context,"Name Must not be empty")

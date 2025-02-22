@@ -1,7 +1,9 @@
 package com.mobile.recorduserapp.service
 
 import com.mobile.recorduserapp.data.request.create_user.CreateUser
+import com.mobile.recorduserapp.data.request.edituser.EditUser
 import com.mobile.recorduserapp.data.response.createuser.CreateUserResponse
+import com.mobile.recorduserapp.data.response.edituser.EditUserResponse
 import com.mobile.recorduserapp.data.response.foods.FoodResponse
 import com.mobile.recorduserapp.data.response.getuser.GetUser
 import com.mobile.recorduserapp.data.response.getusers.GetAllUsers
@@ -10,9 +12,11 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -38,11 +42,34 @@ interface Service{
 
 
     @Headers(
+        "X-Request-ID: 748b37f1-06d3-4915-b340-8207f23d7c9a",
+        "User-Agent: Application-Name/1.0.0 (Operating System Name 1.0.0)"
+    )
+    @PUT("/pupils/{pupilId}")
+    suspend  fun editUser(
+        @Path("pupilId") uid :String,
+        @Body edituser: EditUser):Response<EditUserResponse>
+
+
+
+    @Headers(
         "X-Request-ID: 677449e5-1076-49eb-b2a7-a9cfa5918437",
         "User-Agent: Application-Name/1.0.0 (Operating System Name 1.0.0)"
     )
     @POST("/pupils")
     suspend  fun createUser(@Body createUser: CreateUser):Response<CreateUserResponse>
+
+
+
+
+    @Headers(
+        "X-Request-ID: 748b37f1-06d3-4915-b340-8207f23d7c9a",
+        "User-Agent: Application-Name/1.0.0 (Operating System Name 1.0.0)"
+    )
+    @DELETE("/pupils/{pupilId}")
+    suspend  fun deleteUser(
+        @Path("pupilId") uid :String):Response<EditUserResponse>
+
 
 
 

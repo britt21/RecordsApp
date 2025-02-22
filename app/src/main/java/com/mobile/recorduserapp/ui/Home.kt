@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,6 +66,7 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.mobile.recorduserapp.data.cons.ADDSCREEN
 import com.mobile.recorduserapp.utils.error.errorbox
 import com.mobile.recorduserapp.utils.sh20
 
@@ -214,7 +216,11 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
                                         country = "",
                                         latitude = "",
                                         longitude = "",
-                                        isLoading = true
+                                        isLoading = true,
+                                        navController = navController,
+                                        viewModel = viewModel,
+                                        pupilid = ""
+
                                     )
                                 }
                             } else {
@@ -227,7 +233,11 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
                                                 name = it.name ?: "",
                                                 country = it.country ?: "",
                                                 latitude = it.latitude.toString(),
-                                                longitude = it.longitude.toString()
+                                                longitude = it.longitude.toString(),
+                                                navController = navController,
+                                                viewModel = viewModel,
+                                                pupilid = it.pupilId.toString()
+
                                             )
                                         }
                                     }
@@ -243,10 +253,23 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
                             country = "",
                             latitude = "",
                             longitude = "",
-                            isLoading = true
+                            isLoading = true,
+                            navController = navController,
+                            viewModel = viewModel,
+                            pupilid = ""
+
+
                         )
                     }else{
 
+                                PullToRefreshBox(
+                                    state = refreshscope,
+                                    isRefreshing = it,
+                                    onRefresh = {
+                                        viewModel.getUsers()
+
+                                    }
+                                ) {
                             liveuser?.let { user->
 
                                 LocationCard(
@@ -254,10 +277,15 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
                                     country = "${user.country}",
                                     latitude = "${user.latitude}",
                                     longitude = "${user.longitude}",
+                                    navController = navController,
+                                    viewModel = viewModel,
+                                    pupilid = user.pupilId.toString()
+
+
                                 )
                             }
 
-                        }
+                        }}
                     }
                 }
             }
@@ -275,7 +303,7 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
                 ) {
                     appbutton("Add", modifier = Modifier.fillMaxWidth(), click = {
                         println("TO ADD")
-                        navController.navigate(EDITSCREEN)
+                        navController.navigate(ADDSCREEN)
                     })
                 }
             }
@@ -292,7 +320,10 @@ fun LocationCard(
     country: String,
     latitude: String,
     longitude: String,
-    isLoading: Boolean = false
+    pupilid: String,
+    isLoading: Boolean = false,
+    navController: NavController,
+    viewModel: HomeViewModel
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -304,7 +335,15 @@ fun LocationCard(
             .placeholder(
                 visible = isLoading,
                 highlight = PlaceholderHighlight.shimmer()
-            )
+            ).clickable {
+                viewModel.edituser.name = name
+                viewModel.edituser.country = country
+                viewModel.edituser.latitude = latitude
+                viewModel.edituser.longitude = longitude
+                viewModel.edituser.pupilId = pupilid
+                navController.navigate( EDITSCREEN)
+
+            }
     ) {
         Column(
             modifier = Modifier

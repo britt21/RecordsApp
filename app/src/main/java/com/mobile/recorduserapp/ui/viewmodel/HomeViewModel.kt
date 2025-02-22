@@ -1,10 +1,14 @@
 package com.mobile.recorduserapp.ui.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobile.recorduserapp.data.request.create_user.CreateUser
+import com.mobile.recorduserapp.data.request.edituser.EditUser
 import com.mobile.recorduserapp.data.response.createuser.CreateUserResponse
+import com.mobile.recorduserapp.data.response.edituser.EditUserResponse
 import com.mobile.recorduserapp.data.response.foods.FoodResponse
 import com.mobile.recorduserapp.data.response.getuser.GetUser
 import com.mobile.recorduserapp.data.response.getusers.GetAllUsers
@@ -19,18 +23,22 @@ import java.io.IOException
 class HomeViewModel:ViewModel() {
 
 
+
     val liveUsers = MutableLiveData<GetAllUsers?>()
     val error = MutableLiveData<String?>()
     val isloading = MutableLiveData<Boolean>()
 
 
+    val edituser  by  mutableStateOf(EditUser())
     private fun showError(message: String?) {
-        error.value = message
+        error.postValue( message)
 
     }
 
     fun clearlog(){
         livecreateuser.postValue(null)
+        liveEditUser.postValue(null)
+        liveUser.postValue(null)
     }
 
 
@@ -67,7 +75,9 @@ class HomeViewModel:ViewModel() {
         }
     }
 
-    val liveUser = MutableLiveData<GetUser>()
+    val liveUser = MutableLiveData<GetUser?>()
+    val liveEditUser = MutableLiveData<EditUserResponse?>()
+    val liveDeleteUser = MutableLiveData<Int?>()
 
     fun getUser(userID:String) {
         error.postValue( null)
@@ -82,6 +92,89 @@ class HomeViewModel:ViewModel() {
 
                     println("GOTHERE:; "+response.body())
                     liveUser.postValue(response.body())
+                    isloading.postValue( false)
+
+                }else if (response.code() == 404){
+
+                    showError("User not found")
+                    isloading.postValue( false)
+
+                }else{
+
+                    showError("Unknown error occurred")
+                    isloading.postValue( false)
+
+                }
+
+            } catch (e: Exception) {
+                showError(e.localizedMessage)
+
+                println("IOELOCAL:: "+e.localizedMessage)
+
+                isloading.value = false
+
+
+            }
+        }
+    }
+
+    fun deleteuser(userID:String) {
+        println("DELETEING")
+        error.postValue( null)
+        isloading.postValue(true)
+        viewModelScope.launch {
+            try {
+                val response = ApiService.apicall.deleteUser(userID)
+                println("USER  MAINREST:: "+response.body())
+                println("USER  MAINREST:: "+response.raw().request.url)
+                println("USER  MAINREST:: "+response.raw().request.body)
+                var initcode = 200..209
+                if (response.code() == 200 || response.code() == 201|| response.code() == 203|| response.code() == 204){
+println("DELETESUCCESS "+response.code())
+                    println("GOTHERE:; "+response.body())
+                    liveDeleteUser.postValue(response.code())
+                    isloading.postValue( false)
+
+                }else if (response.code() == 404){
+
+                    showError("User not found")
+                    isloading.postValue( false)
+
+                }else{
+
+                    showError("An error occurred")
+                    isloading.postValue( false)
+
+                }
+
+            } catch (e: Exception) {
+                showError(e.localizedMessage)
+
+                println("IOELOCAL:: "+e.localizedMessage)
+
+                isloading.value = false
+
+
+            }
+        }
+    }
+
+
+
+    fun editUser(userID:String,editUser: EditUser) {
+        println("EDITING_USER "+editUser +" ")
+        error.postValue( null)
+        isloading.postValue(true)
+        viewModelScope.launch {
+            try {
+                val response = ApiService.apicall.editUser(userID,editUser)
+                println("USER  MAINREST:: "+response.body())
+                println("USER  MAINREST:: "+response.raw().request.url)
+                println("USER  MAINREST:: "+response.raw().request.body)
+                if (response.code() == 200 || response.code() == 201){
+
+                    println("GOTHERE:; "+response.body())
+                    liveEditUser.postValue(response.body())
                     isloading.postValue( false)
 
                 }else if (response.code() == 404){

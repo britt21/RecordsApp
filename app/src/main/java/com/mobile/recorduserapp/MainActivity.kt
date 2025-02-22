@@ -13,15 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key.Companion.Home
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.mobile.recorduserapp.data.cons.ADDSCREEN
 import com.mobile.recorduserapp.data.cons.EDITSCREEN
 import com.mobile.recorduserapp.data.cons.HOMESCREEN
 import com.mobile.recorduserapp.ui.AddLocationScreen
+import com.mobile.recorduserapp.ui.EditScreen
 import com.mobile.recorduserapp.ui.HomeScreen
 import com.mobile.recorduserapp.ui.theme.RecordUserAppTheme
+import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +38,8 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
+                var homeviewmodel : HomeViewModel = viewModel()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
                     NavHost(
@@ -44,12 +50,17 @@ class MainActivity : ComponentActivity() {
 
 
                         composable(HOMESCREEN) {
-                            HomeScreen(modifier = Modifier.padding(innerPadding), navController = navController)
+                            HomeScreen(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = homeviewmodel)
                         }
 
 
                         composable(EDITSCREEN) {
-                            AddLocationScreen(modifier = Modifier.padding(innerPadding), navController = navController)
+                            EditScreen(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = homeviewmodel)
+                        }
+
+
+                        composable(ADDSCREEN) {
+                            AddLocationScreen(modifier = Modifier.padding(innerPadding), navController = navController, viewModel = homeviewmodel)
                         }
 
 
