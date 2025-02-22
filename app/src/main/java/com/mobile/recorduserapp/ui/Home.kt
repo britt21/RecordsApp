@@ -1,5 +1,6 @@
 package com.mobile.recorduserapp.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,33 +44,49 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
 import androidx.compose.ui.modifier.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.mobile.recorduserapp.data.cons.EDITSCREEN
 import com.mobile.recorduserapp.ui.theme.litg
 import com.mobile.recorduserapp.ui.theme.whitecolor
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
 import com.mobile.recorduserapp.utils.buttons.appbutton
 import com.mobile.recorduserapp.utils.sh10
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
+import com.mobile.recorduserapp.utils.error.errorbox
 
 
 @Composable
-fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
-
-
+fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navController: NavController){
     val allusers by viewModel.liveUsers.observeAsState()
     val error by viewModel.error.observeAsState()
+    val isloading by viewModel.isloading.observeAsState()
+
+    var context = LocalContext.current
 
 
-    allusers.let { println("DDDAATAA:: +" + it) }
+    allusers?.let {
+        println("DDDAATAA:: +" + it)
+    }
+
+    error?.let {
+        Toast.makeText(context,it,Toast.LENGTH_SHORT).show()
+    }
     println("USERSSFONUND:: "+allusers)
     println("FATALL:: "+error)
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUsers()
     }
+
     Column (
         modifier = modifier
             .background(Color.White)
@@ -83,6 +100,10 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
 
         ) {
 
+            error?.let {
+                errorbox("Error","${it}",{ true}, { viewModel.getUsers()})
+
+            }
 
             Row(
                 modifier = Modifier
@@ -99,7 +120,7 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
 
 
             textboldcutom(text = "Hey there, Lucy! ", size = 15, color = Color.Black)
-            textlit(text = "Are you excited to create a tasty dish today? ", size = 14, color = greyTextColor)
+            textlit(text = "Are you excited to create a task today? ", size = 14, color = greyTextColor)
 
 
             var text by remember { mutableStateOf("") }
@@ -107,7 +128,7 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                placeholder = { Text("Search...", color = Color.Gray) },
+                placeholder = { Text("Search by id...", color = Color.Gray) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -123,87 +144,73 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp,)
+                    .padding(top = 0.dp,)
             )
             sh10()
 
-            Row {
-                Box(modifier = Modifier.height(30.dp)){
-                    textlit(text = "All", size = 13, color = whitecolor)
-                }
-            }
             textboldcutom(text = "All ", size = 14, color = Color.Black)
 
-            Box(
-                modifier = Modifier
-                    .height(250.dp)
-                    .fillMaxWidth().border(color = greyTextColor, width = 1.dp, shape = RoundedCornerShape(10.dp))
-            ) {
+
+            println("ISLOADING:: "+isloading)
+//
+//            if(isloading == true){
+//                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+//                    CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(30.dp))
+//
+//                }
+//            }else{
+//                if(isloading == null){
+//
+//                }
+//            }
 
 
-
-                Column(modifier = Modifier.fillMaxSize().padding(0.dp)) {
-
-                    addimage(image = R.drawable.food, modifier = Modifier.fillMaxWidth())
-
-                        Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-
-                        Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        textboldcutom(
-                            text = "Garlic Butter Shrimp Pasta",
-                            size = 14,
-                            color = Color.Black,
-                            modifier = Modifier.weight(1f) // Ensures text gets space
-                        )
-                        addimage(image = R.drawable.like)
-                    }
-
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        addimage(image = R.drawable.fire)
-                        textlit(
-                            text = "320 Calories",
-                            size = 14,
-                            color = Color.Black,
-                            modifier = Modifier.padding(start = 8.dp) // Adds spacing from image
-                        )
-                    }
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        textlit(
-                            text = "Creamy hummus spread on whole grain toast topped with sliced cucumbers and radishes.",
-                            size = 14,
-                            color = Color.Black,
-                            modifier = Modifier.padding(start = 0.dp)
-                        )
-                    }
-                    }
-
-                }
-            }
 
 
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
-            )
-            {
-                allusers?.let {
-                    items(allusers!!.data!!) {
-
-
-
+                    .height(450.dp)
+            ) {
+                if (isloading == true) {
+                    items(5) {
+                        LocationCard(
+                            name = "",
+                            country = "",
+                            latitude = "",
+                            longitude = "",
+                            isLoading = true
+                        )
+                    }
+                } else {
+                    allusers?.items?.let { info ->
+                        items(info) { item ->
+                            item?.let {
+                                LocationCard(
+                                    name = it.name ?: "",
+                                    country = it.country ?: "",
+                                    latitude = it.latitude.toString(),
+                                    longitude = it.longitude.toString()
+                                )
+                            }
+                        }
                     }
                 }
-
             }
+
         }
 
 
-        Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom){
-            appbutton("Add", modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp))
+
+
+        Box(modifier = Modifier.fillMaxWidth().height(80.dp).padding(vertical = 4.dp)){
+            Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom){
+                appbutton("Add", modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp), click = {
+                    println("TO ADD")
+                    navController.navigate(
+                    EDITSCREEN)})
+            }
+
         }
 
 
@@ -212,43 +219,63 @@ fun HomeScreen(modifier: Modifier,viewModel: HomeViewModel = HomeViewModel()){
     }
 
 @Composable
-fun LocationCard(name: String, country: String, latitude: String, longitude: String) {
+fun LocationCard(
+    name: String,
+    country: String,
+    latitude: String,
+    longitude: String,
+    isLoading: Boolean = false
+) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = litg),
-
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .placeholder(
+                visible = isLoading,
+                highlight = PlaceholderHighlight.shimmer()
+            )
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            InfoText(title = "Name:", value = name, isBold = true)
-            InfoText(title = "Country:", value = country)
-            InfoText(title = "Latitude:", value = latitude)
-            InfoText(title = "Longitude:", value = longitude)
+            InfoText(title = "Name:", value = name, isBold = true, isLoading = isLoading)
+            InfoText(title = "Country:", value = country, isLoading = isLoading)
+            InfoText(title = "Latitude:", value = latitude, isLoading = isLoading)
+            InfoText(title = "Longitude:", value = longitude, isLoading = isLoading)
         }
     }
 }
 
 @Composable
-fun InfoText(title: String, value: String, isBold: Boolean = false) {
-    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+fun InfoText(title: String, value: String, isBold: Boolean = false, isLoading: Boolean = false) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+            .fillMaxWidth()
+    ) {
         Text(
             text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
+            modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = value,
+            text = if (isLoading) "" else value,  // Empty text during shimmer
             fontSize = 16.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-            color = Color.Black.copy(alpha = 0.8f)
+            color = Color.Black.copy(alpha = 0.8f),
+            modifier = Modifier
+                .weight(2f)
+                .placeholder(
+                    visible = isLoading,
+                    highlight = PlaceholderHighlight.shimmer()
+                )
         )
     }
 }

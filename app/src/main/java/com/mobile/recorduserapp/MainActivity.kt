@@ -17,7 +17,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.mobile.recorduserapp.data.cons.EDITSCREEN
 import com.mobile.recorduserapp.data.cons.HOMESCREEN
+import com.mobile.recorduserapp.ui.AddLocationScreen
 import com.mobile.recorduserapp.ui.HomeScreen
 import com.mobile.recorduserapp.ui.theme.RecordUserAppTheme
 
@@ -42,8 +44,15 @@ class MainActivity : ComponentActivity() {
 
 
                         composable(HOMESCREEN) {
-                            HomeScreen(modifier = Modifier.padding(innerPadding))
+                            HomeScreen(modifier = Modifier.padding(innerPadding), navController = navController)
                         }
+
+
+                        composable(EDITSCREEN) {
+                            AddLocationScreen(modifier = Modifier.padding(innerPadding), navController = navController)
+                        }
+
+
                     }
 
                 }
