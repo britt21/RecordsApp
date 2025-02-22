@@ -1,9 +1,12 @@
 package com.mobile.recorduserapp.ui
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,14 +39,17 @@ import com.mobile.recorduserapp.utils.textlit
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.*
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
 import androidx.compose.ui.modifier.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,9 +61,12 @@ import coil3.compose.rememberAsyncImagePainter
 import com.mobile.recorduserapp.data.request.create_user.CreateUser
 import com.mobile.recorduserapp.ui.theme.litg
 import com.mobile.recorduserapp.ui.theme.whitecolor
+import com.mobile.recorduserapp.ui.theme.yellowColor
 import com.mobile.recorduserapp.ui.viewmodel.HomeViewModel
 import com.mobile.recorduserapp.utils.buttons.appbutton
+import com.mobile.recorduserapp.utils.error.errorbox
 import com.mobile.recorduserapp.utils.sh10
+import com.mobile.recorduserapp.utils.showToast
 
 
 @Composable
@@ -73,6 +82,7 @@ fun AddLocationScreen(
     val isloading by viewModel.isloading.observeAsState()
 
 
+    var context = LocalContext.current
     var updatedCountry by remember { mutableStateOf(country) }
     var updatedName by remember { mutableStateOf(name) }
     var updatedImage by remember { mutableStateOf(image) }
@@ -83,7 +93,14 @@ fun AddLocationScreen(
     val error by viewModel.error.observeAsState()
 
     liveuser?.let {
-        println("FOUNDATA:: "+it)
+        LaunchedEffect(Unit) {
+
+
+            showToast(context, "Created Successfully\nID: ${it.pupilId}",)
+            println("FOUNDATA:: " + it)
+            navController.popBackStack()
+            viewModel.clearlog()
+        }
     }
 
 
@@ -99,8 +116,18 @@ fun AddLocationScreen(
             .fillMaxSize()
             .padding(16.dp)
             .background(Color.White)
+            .verticalScroll(rememberScrollState())
+        ,
     ) {
         addimage(R.drawable.back, modifier = Modifier.clickable { navController.popBackStack() })
+
+        error?.let {
+            var createUser = CreateUser(updatedCountry,"https://www.freepik.com/premium-photo/indian-young-happy-man-image_23019783.htm",updatedLatitude,updatedLatitude,updatedName,)
+            println("CREATINGLL:: "+createUser)
+
+            errorbox("Error","${it}",{ true}, { viewModel.createUsers(createUser)})
+
+        }
 
         sh10()
 
@@ -123,6 +150,7 @@ fun AddLocationScreen(
                 }
             }
 
+        sh10()
         // Image Upload Placeholder
         Box(
             modifier = Modifier
@@ -213,13 +241,49 @@ fun AddLocationScreen(
             Button(
                 onClick = {
 
-                    var createUser = CreateUser(updatedCountry,"https://www.freepik.com/premium-photo/indian-young-happy-man-image_23019783.htm",updatedLatitude,updatedLatitude,updatedName,)
-                    viewModel.createUsers(createUser)
+                    if(validator(context = context,updatedName,updatedCountry,updatedLatitude,updatedLongitude)){
+                        var createUser = CreateUser(updatedCountry,"https://www.freepik.com/premium-photo/indian-young-happy-man-image_23019783.htm",updatedLatitude,updatedLatitude,updatedName,)
+                        println("CREATINGLL:: "+createUser)
+                        viewModel.createUsers(createUser)
+
+                    }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                colors = ButtonDefaults.buttonColors(containerColor = yellowColor)
             ) {
-                Text("Save")
+
+                Text("Save", color = Color.Black)
             }
         }
     }
+
+}
+
+fun validator(context:Context,name:String, ct:String, la:String, lo:String, ):Boolean{
+
+    if (name.isEmpty()){
+        showToast(context,"Name Must not be empty")
+        return false
+    }
+
+
+        if (ct.isEmpty()){
+        showToast(context,"Country Must not be empty")
+        return false
+    }
+
+
+        if (la.isEmpty()){
+        showToast(context,"Latitude Must not be empty")
+        return false
+    }
+
+
+        if (lo.isEmpty()){
+        showToast(context,"Longtitude Must not be empty")
+        return false
+    }
+
+    return true
+
+
 }

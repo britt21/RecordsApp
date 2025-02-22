@@ -68,6 +68,7 @@ import com.mobile.recorduserapp.utils.buttons.appbutton
 import com.mobile.recorduserapp.utils.sh10
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
+import com.mobile.recorduserapp.utils.sh20
 
 
 @Composable
@@ -89,29 +90,33 @@ fun errorbox(
                 onDismiss()  // Trigger external dismiss
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        showDialog = false
-                        onDismiss()  // Close button dismiss
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text("Close", color = Color.White)
-                }
+
             },
             dismissButton = {
                 onRetry?.let {
-                    Button(
-                        onClick = {
-                            it()  // Retry action
-                            showDialog = false
-                            onDismiss()  // Dismiss after retry
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Text("Retry", color = Color.White)
+                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround){
+                        Button(
+                            onClick = {
+                                it()  // Retry action
+                                showDialog = false
+                                onDismiss()  // Dismiss after retry
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text("Retry", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = {
+                                showDialog = false
+                                onDismiss()  // Close button dismiss
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text("Close", color = Color.White)
+                        }
                     }
                 }
             },
@@ -125,6 +130,7 @@ fun errorbox(
                         progress = { progress },
                         modifier = Modifier.size(120.dp)
                     )
+                    sh20()
                     Text(title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
             },

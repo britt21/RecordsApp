@@ -40,6 +40,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
@@ -61,97 +63,128 @@ import com.mobile.recorduserapp.utils.buttons.appbutton
 import com.mobile.recorduserapp.utils.sh10
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.mobile.recorduserapp.utils.error.errorbox
+import com.mobile.recorduserapp.utils.sh20
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navController: NavController){
+    val liveuser by viewModel.liveUser.observeAsState()
     val allusers by viewModel.liveUsers.observeAsState()
     val error by viewModel.error.observeAsState()
     val isloading by viewModel.isloading.observeAsState()
 
+
+    val refreshScope = rememberCoroutineScope()
+
+    var refreshscope = rememberPullToRefreshState()
+
     var context = LocalContext.current
 
 
+    var searchid  by remember { mutableStateOf("") }
     allusers?.let {
         println("DDDAATAA:: +" + it)
     }
 
-    error?.let {
-        Toast.makeText(context,it,Toast.LENGTH_SHORT).show()
-    }
+
     println("USERSSFONUND:: "+allusers)
     println("FATALL:: "+error)
+
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUsers()
     }
 
-    Column (
-        modifier = modifier
-            .background(Color.White)
-            .fillMaxSize()) {
-
-        Column (
-            modifier = Modifier
-                .padding(horizontal = 11.dp)
-                .background(Color.White)
-                .fillMaxWidth()
-
-        ) {
-
-            error?.let {
-                errorbox("Error","${it}",{ true}, { viewModel.getUsers()})
-
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+    LaunchedEffect(searchid) {
+        if (inputvalidator(searchid)) {
+            println("POINT:: "+searchid.length)
+            viewModel.getUser(searchid)
+        }
+    }
 
 
-                addimage(image = R.drawable.avatar)
-                addimage(image = R.drawable.bell,Modifier.size(47.dp))
-
-            }
 
 
-            textboldcutom(text = "Hey there, Lucy! ", size = 15, color = Color.Black)
-            textlit(text = "Are you excited to create a task today? ", size = 14, color = greyTextColor)
+            Column (
+                modifier = modifier
+                    .background(Color.White)
+                    .fillMaxSize()) {
+
+                Column (
+                    modifier = Modifier
+                        .padding(horizontal = 11.dp)
+                        .background(Color.White)
+                        .fillMaxWidth()
+
+                ) {
+
+                    error?.let {
+                        errorbox("${it}","",{ true}, { viewModel.getUsers()})
 
 
-            var text by remember { mutableStateOf("") }
+                    }
 
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                placeholder = { Text("Search by id...", color = Color.Gray) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.Gray
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 0.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+
+                        addimage(image = R.drawable.avatar)
+                        addimage(image = R.drawable.bell,Modifier.size(47.dp))
+
+                    }
+
+
+                    textboldcutom(text = "Hey there, Lucy! ", size = 15, color = Color.Black)
+                    textlit(text = "Are you excited to create a task today? ", size = 14, color = greyTextColor)
+
+
+                    var text by remember { mutableStateOf("") }
+
+                    OutlinedTextField(
+                        value = searchid,
+                        onValueChange = { searchid = it },
+                        placeholder = { Text("Search by id...", color = Color.Gray) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = Color.Gray
+                            )
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.LightGray.copy(alpha = 0.2f),
+                            unfocusedContainerColor = Color.LightGray.copy(alpha = 0.2f),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 0.dp,)
                     )
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.LightGray.copy(alpha = 0.2f),
-                    unfocusedContainerColor = Color.LightGray.copy(alpha = 0.2f),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 0.dp,)
-            )
-            sh10()
+                    sh10()
 
-            textboldcutom(text = "All ", size = 14, color = Color.Black)
+                    isloading?.let {
+                        PullToRefreshBox(
+                            state = refreshscope,
+                            isRefreshing = it,
+                            onRefresh = {
+                                    viewModel.getUsers()
+
+                            }
+                        ) {
+
+                    textboldcutom(text = "All ", size = 14, color = Color.Black)
 
 
-            println("ISLOADING:: "+isloading)
+                    println("ISLOADING:: "+isloading)
 //
 //            if(isloading == true){
 //                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
@@ -165,15 +198,46 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
 //            }
 
 
+                    if(liveuser == null){
 
+                        sh20()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 15.dp)
+                                .height(500.dp)
+                        ) {
+                            if (isloading == true) {
+                                items(5) {
+                                    LocationCard(
+                                        name = "",
+                                        country = "",
+                                        latitude = "",
+                                        longitude = "",
+                                        isLoading = true
+                                    )
+                                }
+                            } else {
+                                allusers?.items?.let { info ->
+                                    items(info) { item ->
+                                        item?.let {
+                                            sh20()
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(450.dp)
-            ) {
-                if (isloading == true) {
-                    items(5) {
+                                            LocationCard(
+                                                name = it.name ?: "",
+                                                country = it.country ?: "",
+                                                latitude = it.latitude.toString(),
+                                                longitude = it.longitude.toString()
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }else{
+
+                        if (isloading == true) {
                         LocationCard(
                             name = "",
                             country = "",
@@ -181,40 +245,44 @@ fun HomeScreen(modifier: Modifier, viewModel: HomeViewModel = viewModel(), navCo
                             longitude = "",
                             isLoading = true
                         )
-                    }
-                } else {
-                    allusers?.items?.let { info ->
-                        items(info) { item ->
-                            item?.let {
+                    }else{
+
+                            liveuser?.let { user->
+
                                 LocationCard(
-                                    name = it.name ?: "",
-                                    country = it.country ?: "",
-                                    latitude = it.latitude.toString(),
-                                    longitude = it.longitude.toString()
+                                    name = "${user.name}",
+                                    country = "${user.country}",
+                                    latitude = "${user.latitude}",
+                                    longitude = "${user.longitude}",
                                 )
                             }
+
                         }
                     }
                 }
             }
 
-        }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
 
-
-
-
-        Box(modifier = Modifier.fillMaxWidth().height(80.dp).padding(vertical = 4.dp)){
-            Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom){
-                appbutton("Add", modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp), click = {
-                    println("TO ADD")
-                    navController.navigate(
-                    EDITSCREEN)})
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
+                    appbutton("Add", modifier = Modifier.fillMaxWidth(), click = {
+                        println("TO ADD")
+                        navController.navigate(EDITSCREEN)
+                    })
+                }
             }
 
-        }
 
 
-
+    }
     }
     }
 
@@ -266,7 +334,7 @@ fun InfoText(title: String, value: String, isBold: Boolean = false, isLoading: B
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = if (isLoading) "" else value,  // Empty text during shimmer
+            text = if (isLoading) "" else value,
             fontSize = 16.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
             color = Color.Black.copy(alpha = 0.8f),
@@ -280,4 +348,11 @@ fun InfoText(title: String, value: String, isBold: Boolean = false, isLoading: B
     }
 }
 
+
+fun inputvalidator(userID:String):Boolean{
+    if (userID.length < 4){
+        return false
+    }
+    return true
+}
 

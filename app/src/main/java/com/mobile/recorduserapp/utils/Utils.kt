@@ -1,5 +1,7 @@
 package com.mobile.recorduserapp.utils
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +25,10 @@ fun addimage(image:Int,modifier: Modifier = Modifier){
         contentScale = ContentScale.Crop)
 }
 
+
+fun showToast(context: Context,message:String){
+    Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+}
 
 
 @Composable
