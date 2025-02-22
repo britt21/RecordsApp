@@ -39,6 +39,8 @@ class HomeViewModel:ViewModel() {
         livecreateuser.postValue(null)
         liveEditUser.postValue(null)
         liveUser.postValue(null)
+        liveDeleteUser.postValue(null)
+        liveUsers.postValue(null)
     }
 
 
